@@ -35,6 +35,7 @@ body, html {
 
 .connect > button {
     font-size: 40pt;
+    width: 450px;
 }
 
 .board {

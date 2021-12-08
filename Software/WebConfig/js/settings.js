@@ -114,6 +114,7 @@ class SettingRGB extends Setting {
         var colourPicker = document.createElement('input');
         colourPicker.className = 'colourPicker jscolor {valueElement:null}';
         colourPicker.onchange = this.fireCallback.bind(this);
+        //colourPicker.id = setting.id;
         this.picker = new jscolor(colourPicker)
         
         label.appendChild(colourPicker);
@@ -268,13 +269,13 @@ class SettingMacro extends Setting {
         entry.textContent = setting.name + ':';
         
         entry.appendChild(this.action.createUI({
-            id: setting.id + '-action', name: 'Action',
-            options : [{name: 'Keypress', val: 0},
-                       {name: 'Macro PIN', val: 1},
-                       {name: 'Cycle LED pattern', val: 2},
-                       {name: 'Toggle LEDs', val: 3}]
+            id: setting.id + '-action', name: lang[44],
+            options : [{name: lang[45], val: 0},
+                       {name: lang[46], val: 1},
+                       {name: lang[47], val: 2},
+                       {name: lang[48], val: 3}]
         }));
-        entry.appendChild(this.keypress.createUI({name: 'Key'}));
+        entry.appendChild(this.keypress.createUI({name: lang[49]}));
         
         return entry;
     }
@@ -291,7 +292,7 @@ class SettingMacro extends Setting {
 }
 
 var scancodes = [
-  {name: "None", value: 0x00},
+  {name: lang[50], value: 0x00},
   {name: "A", value: 0x04},
   {name: "B", value: 0x05},
   {name: "C", value: 0x06},

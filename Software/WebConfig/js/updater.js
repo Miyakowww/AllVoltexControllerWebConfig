@@ -15,6 +15,8 @@ var CONFIG_ID = 0x03;
 
 function getLatest(version) {
     return new Promise ((resolve, reject) => {
+        resolve(1);
+        return;
         var req = new XMLHttpRequest();
         req.open("GET", "firmwares/latest.json", true);
         req.responseType = "json";

@@ -3,7 +3,7 @@
 
 // could be monim, could be pretending
 var vids = [0x16D0, 0x1CCF];
-var pids = [0x0A6D, 0x1014];
+var pids = [0x0A6E, 0x1014];
 
 var device;
 
@@ -22,32 +22,32 @@ var commands = {
 };
 
 var configDisplay = [
-    {id: 'controlMode', name: 'Input mode',
-        options : [{name: 'Keyboard/Mouse', val: 0},
-                   {name: 'Joystick', val: 1},
-                   {name: 'e-AMUSEMENT CLOUD (reconnect after change)', val: 2}]},
-    {id: 'switches', name: 'Keyboard bindings', labels: ['START','BT-A','BT-B','BT-C','BT-D','FX-L','FX-R']},
-    {id: 'macroClick', name: 'Macro click'},
-    {id: 'macroHold', name: 'Macro longpress'},
-    {id: 'macroPin', name: 'Macro PIN'},
-    {id: 'lightsOn', name: 'Enable LEDs', children: [
-        {id: 'ledBrightness', name: 'LED Brightness', min: 1, max: 31},
-        {id: 'hidLights', name: 'HID Lights'},
-        {id: 'keyLights', name: 'Key lights', children: [        
-            {id: 'btColour', name: 'BT colour'},
-            {id: 'fxColour', name: 'FX colour'},
-            {id: 'startColour', name: 'START colour'},
+    {id: 'controlMode', name: lang[0],
+        options : [{name: lang[1], val: 0},
+                   {name: lang[2], val: 1},
+                   {name: lang[3], val: 2}]},
+    {id: 'switches', name: lang[4], labels: ['START','BT-A','BT-B','BT-C','BT-D','FX-L','FX-R']},
+    {id: 'macroClick', name: lang[5]},
+    {id: 'macroHold', name: lang[6]},
+    {id: 'macroPin', name: lang[7]},
+    {id: 'lightsOn', name: lang[8], children: [
+        {id: 'ledBrightness', name: lang[9], min: 1, max: 31},
+        {id: 'hidLights', name: lang[10]},
+        {id: 'keyLights', name: lang[11], children: [        
+            {id: 'btColour', name: lang[12]},
+            {id: 'fxColour', name: lang[13]},
+            {id: 'startColour', name: lang[14]},
         ]},
-        {id: 'knobLights', name: 'Knob lights', children: [
-            {id: 'knobL', name: 'VOL-L colour'},
-            {id: 'knobR', name: 'VOL-R colour'},
-        ]},
-        {id: 'lightPattern', name: 'Lights pattern',
-            options : [{name: 'None',     val: 1},
-                       {name: 'Solid',    val: 2},
-                       {name: 'Breathe',  val: 4},
-                       {name: 'Follower', val: 3}]},
-        {id: 'breatheColour', name: 'Solid/Breathe colour'},
+        {id: 'tool2key', name: lang[15]},
+        {id: 'knobLights', name: lang[16]},
+            {id: 'knobL', name: lang[17]},
+            {id: 'knobR', name: lang[18]},
+        {id: 'lightPattern', name: lang[19],
+            options : [{name: lang[20],     val: 1},
+                       {name: lang[21],    val: 2},
+                       {name: lang[22],  val: 4},
+                       {name: lang[23], val: 3}]},
+        {id: 'breatheColour', name: lang[24]},
     ]},
 ];
 
@@ -64,6 +64,7 @@ var settingOrder = [
     'lightsOn',
     'hidLights',
     'keyLights',
+    'tool2key',
     'knobLights',
     'lightPattern',
     'macroClick',
@@ -132,6 +133,7 @@ class ConfigValues {
         this.ledBrightness = new SettingSlider();
         this.hidLights     = new SettingBool();
         this.keyLights     = new SettingBool();
+        this.tool2key      = new SettingBool();
         this.knobLights    = new SettingBool();
         this.lightPattern  = new SettingRadio();
         this.macroClick    = new SettingMacro();
@@ -186,9 +188,17 @@ class ConfigValues {
     }
 }
 
+const SkipOption = [
+//     'btColour',
+//     'fxColour',
+//     'startColour',
+     'tool2key',
+     'knobLights'
+]
+
 class Config {
     constructor() {
-        visibleLog("Welcome to the Pocket Voltex Configurator");
+        visibleLog(lang[25]);
         this.optionsDiv = document.getElementById('configOptions');
         this.config = new ConfigValues();
         // DEBUG
@@ -199,7 +209,7 @@ class Config {
         return window.UsbWrapper.connect(vids, pids)
         .then(selectedDevice => {
             if(!selectedDevice) {
-                return Promise.reject('No device selected');
+                return Promise.reject(lang[26]);
             }
             this.connect(selectedDevice);
         })
@@ -208,10 +218,10 @@ class Config {
     connect(selectedDevice) {
         console.log(selectedDevice);
         device = selectedDevice;
-        visibleLog("Opening device...");
+        visibleLog(lang[27]);
         return device.open()
         .then(() => {
-            console.log("Opened, selecting configuration...");
+            console.log(lang[28]);
             return device.selectConfiguration(1)
         })
         .then(() => {
@@ -224,7 +234,7 @@ class Config {
             } else if(device.deviceVersionSubminor == 3) { // main program
                 return this.loadConfig();
             } else {
-                return Promise.reject("Invalid device found, is this a Tatacon converter?");
+                return Promise.reject(lang[29]);
             }
         })
         .catch(error => {
@@ -249,37 +259,37 @@ class Config {
     }
     
     loadFirmware() {
-        visibleLog("Downloading fimware...");
+        visibleLog(lang[30]);
         return getLatest(this.board)
         .then(downloadLatest)
         .then(firmware => {
-            visibleLog("Flashing firmware...");
+            visibleLog(lang[31]);
             return programLatest(device, firmware);
         })
         .then(() => {
-            visibleLog("Done!");
+            visibleLog(lang[32]);
         })
     }
     
     loadConfig() {
-        console.log("Selected, claiming interface...");
+        console.log(lang[33]);
         return device.claimInterface(0)
         .then(() => {
-            visibleLog("Opened!");
+            visibleLog(lang[34]);
             return this.readVersion();
         })
         .then(version => {
             this.version = version.fw;
             this.board = version.board;
-            visibleLog("Found Pocket Voltex v" + this.version/10.0);
+            visibleLog(lang[35] + this.version/10.0);
             return getLatest(this.board);
         })
         .then(latestInfo => {
             if(latestInfo.version > this.version) {
-                alert("Firmware update required. Device will be rebooted. Connect again to update");
-                visibleLog("Firmware update required. Connect again to update");
+                alert(lang[36]);
+                visibleLog(lang[37]);
                 this.rebootToBootloader();
-                return Promise.reject("Rebooted to bootloader, config read aborted");
+                return Promise.reject(lang[38]);
             }
         })    
         .then(() => {
@@ -290,7 +300,7 @@ class Config {
     
     readVersion() {
         if(!device || !device.opened)
-            return Promise.reject("Device not opened");
+            return Promise.reject(lang[39]);
         
         var data = new Uint8Array(packetSize);
         data[0] = commands.VERSION;
@@ -312,7 +322,7 @@ class Config {
     
     readConfig() {
         if(!device || !device.opened)
-            return Promise.reject("Device not opened");
+            return Promise.reject(lang[39]);
         var data = new Uint8Array(packetSize);
         data[0] = commands.GETCONFIG;
         return device.transferOut(CONFIG_OUT_EPADDR, data)
@@ -325,7 +335,7 @@ class Config {
     
     writeConfig() {
         if(!device || !device.opened)
-            return Promise.reject("Device not opened");
+            return Promise.reject(lang[39]);
         
         console.log("Writing config");
         var data = new Uint8Array(packetSize);
@@ -335,8 +345,8 @@ class Config {
     
     loadDefaults() {
         if(!device || !device.opened)
-            return Promise.reject("Device not opened");
-        if(!confirm('Loading defaults cannot be undone. Are you sure?'))
+            return Promise.reject(lang[39]);
+        if(!confirm(lang[40]))
             return Promise.resolve('Cancelled');
         var data = new Uint8Array(packetSize);
         data[0] = commands.DEFAULTCONFIG;
@@ -346,14 +356,14 @@ class Config {
     
     close() {
         if(!device || !device.opened)
-            return Promise.reject("Device not opened");
-        visibleLog("Closing device...");
+            return Promise.reject(lang[39]);
+        visibleLog(lang[41]);
         return device.close();
     }
     
     rebootToBootloader() {
         if(!device || !device.opened)
-            return Promise.reject("Device not opened");
+            return Promise.reject(lang[39]);
         var data = new Uint8Array(packetSize);
         data[0] = commands.RESET;
         return device.transferOut(CONFIG_OUT_EPADDR, data);
@@ -364,16 +374,44 @@ class Config {
             var settingObj = this.config[setting.id];
             var container = settingObj.createUI(setting);
             settingObj.setCallback(this.writeConfig.bind(this));
-            
+
+            var skip = false;
+            SkipOptions.forEach(option => {
+                if(setting.id == option.id) {
+                    skip = true;
+                }
+            });
+
             if(setting.children) {
                 var newParent = document.createElement('div');
                 newParent.className = 'nestedSetting';
                 
                 this.populateSettings(newParent, setting.children);
-                container.appendChild(newParent);
+                if(!skip) {
+                    container.appendChild(newParent);
+                }
             }
-            parent.appendChild(container);
+            if(!skip) {
+                parent.appendChild(container);
+            }
         });
+    }
+
+    daisuke() {
+        if(!confirm('一键Daisuke会改变某些设置，如想恢复必须手动进行更改。确定继续？'))
+            return Promise.resolve('Cancelled');
+            
+        document.getElementById("lightPattern-0").click();
+        this.config['btColour'].picker.fromRGB(255,255,255);
+        this.config['fxColour'].picker.fromRGB(255,255,255);
+        this.config['startColour'].picker.fromRGB(255,255,255);
+        this.config['knobL'].picker.fromRGB(255,255,255);
+        this.config['knobR'].picker.fromRGB(255,255,255);
+        document.getElementById("check-lightsOn").checked = true;
+        document.getElementById("check-hidLights").checked = false;
+        document.getElementById("check-keyLights").checked = true;
+        document.getElementById("slider-ledBrightness").value = 31;
+        document.getElementById("slider-ledBrightness").oninput.call();
     }
     
     enableUI() {
@@ -382,15 +420,23 @@ class Config {
         
         var defaults = document.createElement('input');
         defaults.type = 'button';
-        defaults.value = 'Load defaults';
+        defaults.value = lang[42];
         defaults.onclick = this.loadDefaults.bind(this);
         this.optionsDiv.appendChild(defaults);
+
+        if(navigator.language.startsWith("zh")) {
+            var defaults = document.createElement('input');
+            defaults.type = 'button';
+            defaults.value = '一键 Daisuke';
+            defaults.onclick = this.daisuke.bind(this);
+            this.optionsDiv.appendChild(defaults);
+        }
         
         this.populateSettings(this.optionsDiv, configDisplay);
     }
     
     disableUI() {
-        visibleLog('Device disconnected');
+        visibleLog(lang[43]);
         document.getElementById('connect').classList.remove('hidden');
         document.getElementById('boardSelector').classList.add('hidden');
         this.optionsDiv.innerHTML = '';
