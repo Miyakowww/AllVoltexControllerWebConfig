@@ -188,7 +188,7 @@ class ConfigValues {
     }
 }
 
-const SkipOption = [
+const SkipOptions = [
 //     'btColour',
 //     'fxColour',
 //     'startColour',
